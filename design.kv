@@ -1,0 +1,460 @@
+#: kivy 2.0.0
+#: import platform kivy.utils.platform
+
+<MainScreen>:
+	on_enter: root.put_images()
+	#ScatterLayout:
+	GridLayout:
+		#do_rotation: False
+		#do_scale: False
+		#do_translation: False
+		#rotation: 90
+		#pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+		#size_hint: None, None
+		size: root.height, root.width
+		cols: 3
+		padding: 5,5
+		GridLayout:
+			cols: 1
+			size_hint: 0.2, 0.2
+			GridLayout:
+				spacing: 5,5
+				cols:1
+				#pos_hint: {"x":.7, "top":1}
+				Button:
+					id: img_btn
+					markup:True
+					#text: "[font=times]Browse"
+					#font_size: '20sp'
+					background_color: 0,0,0,1
+					opacity: 1 if self.state == "normal" else 0.5
+					#color: 0, 0, 0, 1
+					on_press:root.manager.transition.direction = "down"
+					on_release:root.manager.current = "filechooser_screen"
+					Image:
+						source:'images/browse.png'
+						#opacity:"10"
+						#source:'img_vid_btn.png'
+						center_x: self.parent.center_x
+						center_y: self.parent.center_y
+						size: self.size
+						#pos: self.pos
+						allow_stretch: True
+				Button:
+					markup:True
+					halign:'center'
+					#text: "[font=times]Real-Time"
+					font_size: '20sp'
+					background_color: 1,1,1,0
+					#opacity: 1 if self.state == "normal" else 0.5
+					color: 0, 0, 0, 1
+					on_press:
+						main_realTime_press.source = "images/main_realTime_press.png"
+						root.manager.transition.direction = "up"
+					on_release:
+						main_realTime_press.source = "images/main_realTime.png"
+						root.manager.current = 'melon_vid'
+					Image:
+						id: main_realTime_press
+						source:"images/main_realTime.png"
+						center_x: self.parent.center_x
+						center_y: self.parent.center_y
+						size: self.size
+						allow_stretch: True
+				Label:
+					text: ""
+			GridLayout:
+				spacing: 5,5
+				cols:1
+				size_hint: 0.2, 0.2
+				Button:
+					markup:True
+					halign:'center'
+					text: "[font=times]About"
+					background_color: 1,1,1,0
+					opacity: 1 if self.state == "normal" else 0.5
+					color: 0, 0.5, 1, 1
+					on_press:root.manager.transition.direction = "left"
+					on_release:root.manager.current = "about_screen"
+		GridLayout:
+			cols: 1
+			padding: 5,5
+			Carousel:
+				id: car_ims
+				cols:1
+				direction:"right"
+				padding: 5,5
+				#pos_hint: {"x":0.56, "y":0.1}
+				size: root.width, root.height
+				loop: True
+				canvas.before:
+					Color:
+						rgb: 1,1,0
+					Line:
+						width: 2
+						rectangle: self.x, self.y, self.width, self.height
+				GridLayout:
+					cols:1
+					rows:3
+					id: title_text
+					Label:
+						markup:True
+						text: "[size=28][font=times][b]Melons Harvesting System"
+						color: 1, 1, 1, 1
+						size_hint: 0.4, 0.4
+					Label:
+						text: " "
+						size_hint: 0.3, 0.3
+					Label:
+						#size_hint: 0.3, 0.3
+						pos_hint:{'center_x': 0.5, 'center_y': 0.5}
+						markup:True
+						text: "[font=times]By Swapping Right and Left you can see the detected melon details"
+						color: 1, 1, 1, 1
+						size_hint_y:None
+						size: self.size
+						height: self.size[1]
+						text_size:(None,None)
+						halign: "center"
+						valign: "middle"
+
+				Image:
+					id: im_final
+					source: 'mymodels/output_images/Final.png'
+					allow_stretch: True
+				Image:
+					id: melon_id
+					source: 'mymodels/output_images/melon.png'
+					allow_stretch: True
+				Image:
+					id: melon_mask_id
+					source: 'mymodels/output_images/melon_mask.png'
+					allow_stretch: True
+				Image:
+					id: roi_fin_id
+					source: 'mymodels/output_images/roi_fin.png'
+					allow_stretch: True
+				Image:
+					id: red_id
+					source: 'mymodels/output_images/red_mf.png'
+					allow_stretch: True
+				Image:
+					id: green_id
+					source: 'mymodels/output_images/green_mf.png'
+					allow_stretch: True
+				Image:
+					id: blue_id
+					source: 'mymodels/output_images/blue_mf.png'
+					allow_stretch: True
+				Image:
+					id: index_id
+					source: 'mymodels/output_images/index.png'
+					allow_stretch: True
+	
+<FilechooserScreen>:
+	on_enter: root.selected()
+	GridLayout:
+		clos:2
+		rows:1
+		#padding: 5, 5
+		GridLayout:
+			cols:1
+			rows:1
+			pos_hint: {"x":1, "top":1}
+			AsyncImage:
+				id: img_path
+				source: "images/img_none.png"
+				#size_hint: 0.3, 0.2
+				Button:
+					id:img_vid_btn
+					opacity:"0"
+					disabled: True
+					background_color:0,0,0,0
+					pos_hint: {'center_x': 0.5}
+					center_x: self.parent.center_x
+					center_y: self.parent.center_y
+					on_press: img_on_btn.source = "images/img_vid_btn.png"
+					on_release: 
+						img_on_btn.source = "images/img_vid_btn_release.png"
+						root.manager.transition.direction = "right"
+						root.manager.current = "vid_show"
+					Image:
+						id:img_on_btn
+						source:'images/img_vid_btn_release.png'
+						#opacity:"10"
+						#source:'img_vid_btn.png'
+						center_x: self.parent.center_x
+						center_y: self.parent.center_y
+						allow_stretch: True
+		GridLayout:
+			cols:1
+			rows:3
+			spacing: 5,5
+			size_hint: 0.3, 0.2
+			pos_hint: {"x":0}
+			Button:
+				id: browse_again
+				background_color: 0,0,0,1
+				opacity: 1 if self.state == "normal" else 0.5
+				on_press:
+					root.selected()
+				Image:
+					source:'images/browse.png'
+					center_x: self.parent.center_x
+					center_y: self.parent.center_y
+					size: self.size
+					#pos: self.pos
+					allow_stretch: True
+			Button:
+				id: detect_btn
+				#text: "Process"
+				on_press: 
+					img_detect_choser.source = 'images/process2.png'
+				on_release: 
+					img_detect_choser.source = 'images/process.png'
+					root.chk()
+				background_color:0,0,0,0
+				Image:
+					id:img_detect_choser
+					source:'images/process.png'
+					center_x: self.parent.center_x
+					center_y: self.parent.center_y
+					allow_stretch: True
+			Button:
+				id: test_btn
+				on_press: back_win.source = 'images/back_press.png'
+				on_release:
+					back_win.source = 'images/back.png'
+					root.go_to_main()
+				#text: "Back"
+				background_color:0,0,0,0
+				Image:
+					id: back_win
+					source:'images/back.png'
+					size:self.parent.parent.width // 2, self.parent.parent.height // 2
+					center_x: self.parent.center_x
+					center_y: self.parent.center_y
+					allow_stretch: True
+	#GridLayout:
+	#	cols:1
+		#rows:1
+	#	Button:
+	#		id: filechooser
+	#		text: "Open File Chooser"
+	#		on_release:
+	#			root.selected()
+<VidShow>:
+	on_enter: 
+		vid.source = root.read_path()
+	on_pre_leave:vid.play=False
+	GridLayout:
+		cols:2
+		padding: 5, 5
+		GridLayout:
+			cols:1
+			Video:
+				id:vid
+				source:""
+				state:'play'
+				on_touch_down: root.on_vid_touched()
+				on_state: root.videoplayer_state()
+				options: {'eos': 'loop'}
+				allow_stretch: True
+		GridLayout:
+			cols:1
+			#rows:3
+			size_hint: 0.2, 0.2
+			pos_hint: {"x":0.011, "y":0.02}
+			spacing: 5, 5
+			Button:
+				id:vid_show_back_btn
+				#text: "Back"
+				pos_hint: {"x":0, "top":1}
+				background_color:0,0,0,0
+				on_press: 
+					root.ids.vid.state = "stop"
+					right_img.source = 'images/right_press.png'
+				on_release:
+					right_img.source = 'images/right.png'
+					root.manager.transition.direction = "left"
+					root.manager.current ="filechooser_screen"
+				Image:
+					id: right_img
+					source:'images/right.png'
+					size:self.parent.width // 2, self.parent.height // 2
+					center_x: self.parent.center_x
+					center_y: self.parent.center_y
+					allow_stretch: True
+			Button:
+				id:on_vid_pause
+				#text: "Use a snap!"
+				background_color:0,0,0,0
+				opacity: 0
+				disabled: True
+				on_press: root.on_vid_pause_press()
+				on_release: root.on_vid_pause_released()
+				Image:
+					id:img_process_vid_btn
+					source:'images/process.png'
+					#size:self.parent.width, self.parent.height // 2
+					center_x: self.parent.center_x
+					center_y: self.parent.center_y
+					allow_stretch: True
+
+<RealTimeWin>:
+	on_enter: root.cma_play() 
+	on_leave: root.onLeave_vid()
+	#ScatterLayout:
+	GridLayout:
+		#do_rotation: False
+		#do_scale: False
+		#do_translation: False
+		#rotation: 90
+		size: root.height, root.width
+		cols: 2
+		GridLayout:
+			cols: 1
+			size_hint: 0.2, 1
+			id: chk_size
+			padding: 5,5
+			spacing: 4,4
+			#pos_hint: {"x":.7, "top":1}
+			ToggleButton:
+				id: cap_btn
+				background_color: 0,0,0,0
+				size_hint: 0.16, 0.16
+				#text: "Pause"
+				#on_press: root.cameraObject.play = not root.cameraObject.play
+				on_state: root.stop_play_state()
+				Image:
+					id:img_cap_btn
+					source:'images/pause.png'
+					#size_hint:self.parent.width, self.parent.height
+					#size:self.parent.width // 1.5, self.parent.height // 1.5
+					center_x: self.parent.center_x
+					center_y: self.parent.center_y
+					allow_stretch: True	
+			ToggleButton:
+				id: live_btn
+				background_color: 0,0,0,0
+				size_hint: 0.16, 0.16
+				on_state: root.live_off_on()
+				Image:
+					id: btn_img_live
+					source:'images/live_on.png'
+					#size:self.parent.width , self.parent.height
+					center_x: self.parent.center_x
+					center_y: self.parent.center_y
+					allow_stretch: True	
+			Button:
+				id: detect_img_btn
+				background_color: 0,0,0,0
+				opacity: 0
+				disabled: True
+				size_hint: 0.16, 0.16
+				on_press:
+					process_img.source = 'images/process2.png'
+				on_release:
+					process_img.source = 'images/process.png'
+					root.snapShot_detection()
+				Image:
+					id: process_img
+					source:'images/process.png'
+					#size:self.parent.width, self.parent.height // 1.5
+					center_x: self.parent.center_x
+					center_y: self.parent.center_y
+					allow_stretch: True	
+			Button:
+				#id: back_btn
+				background_color: 0,0,0,0
+				size_hint: 0.16, 0.16
+				Image:
+					id: mask_result
+					source:'images/img_none.png'
+					center_x: self.parent.center_x
+					center_y: self.parent.center_y
+					allow_stretch: True		
+			Button:
+				#id: back_btn
+				background_color: 0,0,0,0
+				size_hint: 0.16, 0.16
+				Image:
+					id: roi_btn
+					source:'images/img_none.png'
+					center_x: self.parent.center_x
+					center_y: self.parent.center_y
+					allow_stretch: True		
+			Button:
+				id: back_btn
+				background_color: 0,0,0,0
+				size_hint: 0.16, 0.16
+				on_press: 
+					back_to_main.source = 'images/back_press.png'
+					root.manager.transition.direction = "down"
+				on_release:
+					root.manager.current = "main_scr"
+				Image:
+					id: back_to_main
+					source:'images/back.png'
+					size:self.parent.parent.width // 2, self.parent.parent.height // 2
+					center_x: self.parent.center_x
+					center_y: self.parent.center_y
+					allow_stretch: True		
+		RelativeLayout:
+			padding: 5,5
+			#spacing: 5
+			id: cam_pos
+            #:import XCamera kivy_garden.xcamera.XCamera
+			XCamera:
+			    id: camera
+			    #resolution: self.parent.size
+			    canvas.before:
+                    PushMatrix:
+                    Rotate:
+                        angle: -90 if platform == "android" else 0
+                        axis: 0,0,1
+                        origin: cam_pos.width/2, cam_pos.height/2
+                canvas.after:
+                    PopMatrix:
+			#Widget:
+			#BoxLayout:
+				#orientation: "vertical"
+				#size: root.width, root.height
+<AboutScr>:
+	GridLayout:
+		cols:1
+		padding: 15,15
+		spacing:20,20
+		ScrollView:
+			size_hint: 0.8,0.8
+			Label:
+				id: about_text
+				text_size: self.width, None
+				size_hint_y: None
+				height: self.texture_size[1]
+				markup: True
+				multiline:True
+				text: "[font=times]{}".format(root.abs_text())
+		GridLayout:
+			cols:1
+			padding: 15,15
+			spacing:20,20
+			size_hint: 0.2, 0.2
+			Button:
+				#pos_hint: {"center_x": 0.5, "center_y": 0.5}
+				text: "Back"
+				on_press:root.manager.transition.direction = "right"
+				on_release:root.manager.current = "main_scr"
+
+			
+<RootWidget>:
+	MainScreen:
+		name: 'main_scr'
+	FilechooserScreen:
+		name: "filechooser_screen"
+	RealTimeWin:
+		name: "melon_vid"
+	VidShow:
+		name: "vid_show"
+	AboutScr:
+		name: "about_screen"
